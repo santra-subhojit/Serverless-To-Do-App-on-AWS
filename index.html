@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Serverless To-Do App</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Serverless To-Do App</h1>
+    <input type="text" id="taskInput" placeholder="Enter a task...">
+    <button onclick="addTask()">Add Task</button>
+    <ul id="todoList"></ul>
+  </div>
+
+  <script>
+    const apiUrl = 'https://your-api-id.execute-api.your-region.amazonaws.com/prod/todos';
+
+    async function fetchTodos() {
+      const response = await fetch(apiUrl);
+      const todos = await response.json();
+      const list = document.getElementById('todoList');
+      list.innerHTML = '';
+      todos.forEach(todo => {
+        const listItem = document.createElement('li');
+        listItem.textContent = todo.task;
+        list.appendChild(listItem);
+      });
+    }
+
+    async function addTask() {
+      const task = document.getElementById('taskInput').value;
+      if (!task) return;
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task })
+      });
+      if (response.ok) {
+        document.getElementById('taskInput').value = '';
+        fetchTodos();
+      }
+    }
+
+    fetchTodos();
+  </script>
+</body>
+</html>
